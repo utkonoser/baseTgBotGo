@@ -37,6 +37,6 @@ func main() {
 	commander := commands.NewCommander(bot,productService)
 
 	for update := range updates {
-		commander.HandleUpdate(update.Message)
+		commander.HandleUpdate(update)
 	}
 }

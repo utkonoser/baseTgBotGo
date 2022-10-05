@@ -14,24 +14,39 @@ func (c *Commander) Default(inputMessage *tgbotapi.Message) {
 	c.bot.Send(msg)
 }
 
-func (c *Commander) HandleUpdate(inputMessage *tgbotapi.Message) {
+func (c *Commander) HandleUpdate(update tgbotapi.Update) {
 	defer func() {
 		if panicValue := recover(); panicValue != nil {
 			log.Printf("recoverd from panic: %v", panicValue)
 		}
 	}()
 
-	if inputMessage == nil {
+	if update.CallbackQuery != nil {
+		msg := tgbotapi.NewMessage(
+			update.CallbackQuery.Message.Chat.ID,
+			"Data:"+update.CallbackQuery.Data,
+		)
+		c.bot.Send(msg)
 		return
 	}
-	switch inputMessage.Command() {
+
+	if update.Message == nil {
+		return
+	}
+	switch update.Message.Command() {
 	case "help":
-		c.Help(inputMessage)
+		c.Help(update.Message)
 	case "get":
-		c.Get(inputMessage)
+		c.Get(update.Message)
 	case "list":
-		c.List(inputMessage)
+		c.List(update.Message)
+	case "delete":
+		c.Delete(update.Message)
+	case "create":
+		c.Create(update.Message)
+	case "replace":
+		c.Replace(update.Message)
 	default:
-		c.Default(inputMessage)
+		c.Default(update.Message)
 	}
 }
